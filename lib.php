@@ -69,4 +69,11 @@ class repository_imagehub extends repository {
         $ret['nologin'] = true;
         return $ret;
     }
+
+    /**
+     * This plugin supports only web images.
+     */
+    public function supported_filetypes() {
+        return ['web_image'];
+    }
 }
