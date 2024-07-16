@@ -15,20 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * English language pack for Imagehub
+ * Tag area definitions for Imagehub
+ *
+ * Documentation: {@link https://moodledev.io/docs/apis/subsystems/tag}
  *
  * @package    repository_imagehub
- * @category   string
  * @copyright  2024 ISB Bayern
- * @author     Stefan Hanauska <stefan.hanauska@csg-in.de>
+ * @author     Paola Maneggia
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['configplugin'] = 'Imagehub repository type configuration';
-$string['imagehub:view'] = 'View Imagehub repository';
-$string['pluginname'] = 'Imagehub';
-$string['privacy:metadata'] = 'The Imagehub plugin doesn\'t store any personal data.';
-$string['tagarea_repository_imagehub'] = 'Repository imagehug';
-$string['tagcollection_repository_imagehub_standard_collection'] = 'Tagcollection repository imagehub standard collection';
+$tagareas = [
+    [
+        'itemtype' => 'repository_imagehub',
+        'component' => 'repository_imagehub',
+        'collection' => 'repository_imagehub_standard_collection',
+    ],
+];
