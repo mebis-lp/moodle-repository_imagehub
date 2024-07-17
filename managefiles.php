@@ -15,22 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * English language pack for Imagehub
+ * Manage files in the repository
  *
  * @package    repository_imagehub
- * @category   string
  * @copyright  2024 ISB Bayern
  * @author     Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+require('../../config.php');
 
-$string['configplugin'] = 'Imagehub repository type configuration';
-$string['imagehub:view'] = 'View Imagehub repository';
-$string['managefiles'] = 'Manage files';
-$string['managesources'] = 'Manage sources';
-$string['pluginname'] = 'Imagehub';
-$string['privacy:metadata'] = 'The Imagehub plugin doesn\'t store any personal data.';
-$string['tagarea_repository_imagehub'] = 'Repository imagehug';
-$string['tagcollection_repository_imagehub_standard_collection'] = 'Tagcollection repository imagehub standard collection';
+require_login();
+
+$url = new moodle_url('/repository/imagehub/managefiles.php', []);
+$PAGE->set_url($url);
+$PAGE->set_context(context_system::instance());
+
+$PAGE->set_heading(get_string('managefiles', 'repository_imagehub'));
+echo $OUTPUT->header();
+
+$fs = get_file_storage();
+
+$tree = $fs->get_area_tree(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0);
+
+if (count($tree['subdirs']) == 0 || !array_key_exists('manual', $tree['subdirs'])) {
+    $fs->create_directory(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0, '/manual/');
+}
+
+
+
+$managefilesform = new \repository_imagehub\form\managefiles_form();
+
+$managefilesform->display();
+
+echo $OUTPUT->footer();

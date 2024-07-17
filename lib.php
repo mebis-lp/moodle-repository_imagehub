@@ -76,4 +76,72 @@ class repository_imagehub extends repository {
     public function supported_filetypes() {
         return ['web_image'];
     }
+
+    /**
+     * Repository supports only internal files.
+     *
+     * @return int
+     */
+    public function supported_returntypes() {
+        return FILE_INTERNAL;
+    }
+
+    /**
+     * Create an instance for this plug-in
+     *
+     * @param string $type the type of the repository
+     * @param int $userid the user id
+     * @param stdClass $context the context
+     * @param array $params the options for this instance
+     * @param int $readonly whether to create it readonly or not (defaults to not)
+     * @return mixed
+     * @throws dml_exception
+     * @throws required_capability_exception
+     */
+    public static function create($type, $userid, $context, $params, $readonly=0) {
+        require_capability('moodle/site:config', context_system::instance());
+        return parent::create($type, $userid, $context, $params, $readonly);
+    }
+
+    /**
+     * Get the configuration form for this repository type.
+     */
+    public static function type_config_form($mform, $classname = 'repository_imagehub') {
+        $mform->addElement('static', null, '', 'Test');
+    }
+
+    /**
+     * Return names of the general options.
+     * By default: no general option name
+     *
+     * @return array
+     */
+    public static function get_type_option_names() {
+        return ['pluginname'];
+    }
+
+    /**
+     * Save settings for this instance
+     */
+    public function set_options($options = []) {
+        return parent::set_options($options);
+    }
+
+    /**
+     * Is this repository used to browse moodle files?
+     *
+     * @return boolean
+     */
+    public function has_moodle_files() {
+        return true;
+    }
+
+    // public static function get_instance_option_names() {
+    //     return ['sources'];
+    // }
+
+    public function update_options($options = null) {
+        
+        parent::update_options($options);
+    }
 }

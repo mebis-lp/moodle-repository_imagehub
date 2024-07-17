@@ -14,23 +14,39 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace repository_imagehub\form;
+
+use moodleform;
+
 /**
- * English language pack for Imagehub
+ * Class managefiles_form
  *
  * @package    repository_imagehub
- * @category   string
  * @copyright  2024 ISB Bayern
  * @author     Stefan Hanauska <stefan.hanauska@csg-in.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+class managefiles_form extends moodleform {
+    public function definition() {
+        $mform = $this->_form;
 
-defined('MOODLE_INTERNAL') || die();
+        $mform->addElement('filemanager', 'files', get_string('files'), null, [
+            'subdirs' => 1,
+            'maxbytes' => 0,
+            'maxfiles' => -1,
+            'accepted_types' => ['web_image'],
+        ]);
 
-$string['configplugin'] = 'Imagehub repository type configuration';
-$string['imagehub:view'] = 'View Imagehub repository';
-$string['managefiles'] = 'Manage files';
-$string['managesources'] = 'Manage sources';
-$string['pluginname'] = 'Imagehub';
-$string['privacy:metadata'] = 'The Imagehub plugin doesn\'t store any personal data.';
-$string['tagarea_repository_imagehub'] = 'Repository imagehug';
-$string['tagcollection_repository_imagehub_standard_collection'] = 'Tagcollection repository imagehub standard collection';
+        $mform->addElement(
+            'tags',
+            'tags',
+            get_string('tags'),
+            [
+                'itemtype' => 'imagehub_file',
+                'component' => 'repository_imagehub',
+            ]
+        );
+
+        $this->add_action_buttons();
+    }
+}
