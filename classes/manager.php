@@ -16,6 +16,8 @@
 
 namespace repository_imagehub;
 
+use core_tag_tag;
+use moodle_exception;
 use stored_file;
 
 /**
@@ -27,12 +29,49 @@ use stored_file;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
-    public static function import_files_from_zip(stored_file $zip) {
+    public static function add_item(stored_file $file, string $source, array $metadata = []) {
+        global $DB;
+        $fs = get_file_storage();
+        $filerecord = [
+            'contextid' => CONTEXT_SYSTEM,
+            'component' => 'repository_imagehub',
+            'filearea' => 'images',
+            'itemid' => 0,
+            'filepath' => '/' . $source . $file->get_filepath(),
+            'filename' => $file->get_filename(),
+        ];
 
+        $filerecord = array_merge($metadata, $filerecord);
+
+        $newfile = $fs->create_file_from_storedfile($filerecord, $file);
+        $recordid = $DB->insert_record('repository_imagehub', [
+            'fileid' => $newfile->get_id(),
+            'source' => $source,
+        ]);
+
+        foreach($metadata['tags'] as $tag) {
+            core_tag_tag::add_item_tag(
+                'repository_imagehub',
+                'repository_imagehub',
+                $recordid,
+                \core\context\system::instance(),
+                $tag
+            );
+        }
+    }
+
+    public static function import_files_from_zip(stored_file $zip) {
+        
     }
 
     public static function import_files_from_directory(stored_file $directory) {
+        $fs = get_file_storage();
 
+        if(!$directory->is_directory()) {
+            throw new moodle_exception('not_a_directory', 'repository_imagehub');
+        }
+        
+        
     }
 
     public static function import_files_from_git(\moodle_url $gitrepository) {

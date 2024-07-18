@@ -42,8 +42,9 @@ class managefiles_form extends moodleform {
             'tags',
             get_string('tags'),
             [
-                'itemtype' => 'imagehub_file',
+                'itemtype' => 'repository_imagehub',
                 'component' => 'repository_imagehub',
+                'collection' => 'repository_imagehub_standard_collection',
             ]
         );
 
