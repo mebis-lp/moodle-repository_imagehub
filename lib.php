@@ -25,6 +25,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\reportbuilder\local\entities\context;
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/repository/lib.php');
@@ -63,11 +65,29 @@ class repository_imagehub extends repository {
      */
     public function get_listing($path = '', $page = '') {
         $ret = [];
-        $ret['list'] = [];
-        $ret['nosearch'] = true;
+        $ret['list'] = self::get_file_list($path, $page);
         $ret['norefresh'] = true;
         $ret['nologin'] = true;
+        $ret['dynload'] = true;
         return $ret;
+    }
+
+    public function get_file_list($path = '', $page = '', $search = ''): array {
+        global $DB;
+
+        $filelist = [];
+
+        $fs = get_file_storage();
+        // Only manual files for now, needs to be changed as soon as there are other sources.
+        $files = $fs->get_directory_files(context_system::instance()->id, 'repository_imagehub', 'image', 0, '/manual/', true, true);
+        $results = $DB->get_records('repository_imagehub', null, '', 'fileid, title');
+        foreach ($files as $file) {
+            $filelist[] = [
+                'title' => $results[$file->id] ?? $file->get_filename(),
+                'size' => $file->get_filesize(),
+            ];
+        }
+        return $files;
     }
 
     /**

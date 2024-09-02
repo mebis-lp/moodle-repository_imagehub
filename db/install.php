@@ -15,7 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Manage sources for the repository
+ * Install script for Imagehub
+ *
+ * Documentation: {@link https://moodledev.io/docs/guides/upgrade}
  *
  * @package    repository_imagehub
  * @copyright  2024 ISB Bayern
@@ -23,21 +25,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require('../../config.php');
-
-require_login();
-
-$url = new moodle_url('/repository/imagehub/managesources.php', []);
-$PAGE->set_url($url);
-$PAGE->set_context(context_system::instance());
-
-$PAGE->set_heading(get_string('managesources', 'repository_imagehub'));
-echo $OUTPUT->header();
-
-$sources = array_values($DB->get_records('repository_imagehub_sources'));
-
-echo($OUTPUT->render_from_template('repository_imagehub/managesources', [
-    'sources' => $sources,
-]));
-
-echo $OUTPUT->footer();
+/**
+ * Executed on installation of Imagehub
+ *
+ * @return bool
+ */
+function xmldb_repository_imagehub_install() {
+    global $DB;
+    $DB->insert_record('repository_imagehub_sources', [
+        'title' => 'Manual',
+        'type' => 'manual',
+        'dirname' => '/manual/',
+        'timemodified' => time(),
+        'lastupdate' => time(),
+    ]);
+    $fs = get_file_storage();
+    $fs->create_directory(core\context\system::instance()->id, 'repository_imagehub', 'images', 0, '/manual/');
+    return true;
+}

@@ -27,6 +27,8 @@ require('../../config.php');
 
 require_login();
 
+$sourceid = required_param('sourceid', PARAM_INT);
+
 $url = new moodle_url('/repository/imagehub/managefiles.php', []);
 $PAGE->set_url($url);
 $PAGE->set_context(context_system::instance());
@@ -34,15 +36,11 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_heading(get_string('managefiles', 'repository_imagehub'));
 echo $OUTPUT->header();
 
+$source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
+
 $fs = get_file_storage();
 
-$tree = $fs->get_area_tree(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0);
-
-if (count($tree['subdirs']) == 0 || !array_key_exists('manual', $tree['subdirs'])) {
-    $fs->create_directory(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0, '/manual/');
-}
-
-
+$tree = $fs->get_directory_files(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0, $source->dirname);
 
 $managefilesform = new \repository_imagehub\form\managefiles_form();
 

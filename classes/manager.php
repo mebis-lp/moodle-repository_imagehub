@@ -29,15 +29,22 @@ use stored_file;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
-    public static function add_item(stored_file $file, string $source, array $metadata = []) {
+    /**
+     * Add a file to the repository.
+     * @param stored_file $file
+     * @param int $source The id of the source.
+     * @param array $metadata
+     */
+    public static function add_item(stored_file $file, int $sourceid, array $metadata = []) {
         global $DB;
+        $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
         $fs = get_file_storage();
         $filerecord = [
             'contextid' => CONTEXT_SYSTEM,
             'component' => 'repository_imagehub',
             'filearea' => 'images',
             'itemid' => 0,
-            'filepath' => '/' . $source . $file->get_filepath(),
+            'filepath' => $source->dirname,
             'filename' => $file->get_filename(),
         ];
 
@@ -46,10 +53,10 @@ class manager {
         $newfile = $fs->create_file_from_storedfile($filerecord, $file);
         $recordid = $DB->insert_record('repository_imagehub', [
             'fileid' => $newfile->get_id(),
-            'source' => $source,
+            'source' => $sourceid,
         ]);
 
-        foreach($metadata['tags'] as $tag) {
+        foreach ($metadata['tags'] as $tag) {
             core_tag_tag::add_item_tag(
                 'repository_imagehub',
                 'repository_imagehub',
@@ -67,11 +74,9 @@ class manager {
     public static function import_files_from_directory(stored_file $directory) {
         $fs = get_file_storage();
 
-        if(!$directory->is_directory()) {
+        if (!$directory->is_directory()) {
             throw new moodle_exception('not_a_directory', 'repository_imagehub');
-        }
-        
-        
+        } 
     }
 
     public static function import_files_from_git(\moodle_url $gitrepository) {
@@ -80,25 +85,5 @@ class manager {
 
     public static function import_files_from_web(\moodle_url $weburl) {
         
-    }
-
-    /**
-     * Check for manual source - will be created if it does not exists.
-     */
-    public static function check_for_manual_source() {
-        global $DB;
-
-        $manualname = 'manual';
-
-        $fs = get_file_storage();
-
-        $tree = $fs->get_area_tree(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0);
-
-        if (count($tree['subdirs']) == 0 || !array_key_exists($manualname, $tree['subdirs'])) {
-            $fs->create_directory(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0, '\/' . $manualname . '\/');
-        }
-
-        
-
     }
 }
