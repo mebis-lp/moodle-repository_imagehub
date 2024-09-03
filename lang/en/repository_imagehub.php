@@ -28,6 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['configplugin'] = 'Imagehub repository type configuration';
 $string['imagehub:view'] = 'View Imagehub repository';
+$string['manage_files'] = 'Manage files';
 $string['managefiles'] = 'Manage files';
 $string['managesources'] = 'Manage sources';
 $string['pluginname'] = 'Imagehub';

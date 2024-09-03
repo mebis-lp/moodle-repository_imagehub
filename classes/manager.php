@@ -19,6 +19,7 @@ namespace repository_imagehub;
 use core_tag_tag;
 use moodle_exception;
 use stored_file;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class manager
@@ -67,16 +68,153 @@ class manager {
         }
     }
 
-    public static function import_files_from_zip(stored_file $zip) {
-        
+    /**
+     * Remove a file from the repository.
+     * @param int $itemid The id of the item.
+     */
+    public static function remove_item(int $itemid) {
+        global $DB;
+        $record = $DB->get_record('repository_imagehub', ['id' => $itemid], '*', MUST_EXIST);
+        $fs = get_file_storage();
+        $fs->delete_area_files(
+            $record->contextid,
+            'repository_imagehub',
+            'images',
+            $record->fileid
+        );
+        $DB->delete_records('repository_imagehub', ['id' => $itemid]);
     }
 
-    public static function import_files_from_directory(stored_file $directory) {
+    /**
+     * Update a file in the repository.
+     * @param int $itemid The id of the item.
+     * @param array $metadata The metadata to update.
+     */
+    public static function update_item(int $itemid, array $metadata) {
+        global $DB;
+        $record = $DB->get_record('repository_imagehub', ['id' => $itemid], '*', MUST_EXIST);
         $fs = get_file_storage();
+        $file = $fs->get_file_by_id($record->fileid);
+        if (isset($metadata['title'])) {
+            $DB->update_record('repository_imagehub', [
+                'id' => $itemid,
+                'title' => $metadata['title'],
+            ]);
+        }
+        if (isset($metadata['tags'])) {
+            core_tag_tag::set_item_tags(
+                'repository_imagehub',
+                'repository_imagehub',
+                $itemid,
+                context_system::instance(),
+                $metadata['tags']
+            );
+        }
+        if (isset($metadata['author'])) {
+            $file->set_author($metadata['author']);
+        }
+    }
 
+    /**
+     * Process metadata for a source.
+     * @param int $sourceid The id of the source.
+     */
+    public static function process_metadata(int $sourceid) {
+        global $DB;
+        $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
+        $fs = get_file_storage();
+        $files = $fs->get_directory_files(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0, $source->dirname);
+        foreach ($files as $file) {
+            if ($file->filename == 'metadata.yml') {
+                $metadata = Yaml::parse($file->get_content());
+                $imagefile = $fs->get_file(
+                    $file->contextid,
+                    $file->component,
+                    $file->filearea,
+                    $file->itemid,
+                    $file->filepath,
+                    $metadata->filename
+                );
+                if ($imagefile) {
+                    $item = self::get_item_from_fileid($imagefile->get_id());
+                    self::update_item($item->id, $metadata);
+                }
+                $file->delete();
+            }
+        }
+    }
+
+    /**
+     * Get an item from a file id.
+     * @param int $fileid The id of the file.
+     * @return object The item.
+     */
+    public static function get_item_from_fileid(int $fileid): object {
+        global $DB;
+        return $DB->get_record('repository_imagehub', ['fileid' => $fileid], '*', MUST_EXIST);
+    }
+
+    /**
+     * Import files from a zip file.
+     * @param stored_file $zip The zip file.
+     * @param int $sourceid The id of the source.
+     * @param bool $deleteold Whether to delete old files. Default is false.
+     */
+    public static function import_files_from_zip(stored_file $zip, int $sourceid, bool $deleteold = false) {
+        global $DB;
+        $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
+
+        $fp = get_file_packer('application/zip');
+        $itemid = time();
+        $zip->extract_to_storage($fp, \context_system::instance(), 'repository_imagehub', 'temp', $itemid, $source->dirname);
+
+        $fs = get_file_storage();
+        $directory = $fs->get_file(CONTEXT_SYSTEM, 'repository_imagehub', 'temp', $itemid, $source->dirname, '.');
+
+        self::import_files_from_directory($directory, $sourceid, $deleteold);
+    }
+
+    /**
+     * Import files from a directory.
+     * @param stored_file $directory The directory.
+     * @param int $sourceid The id of the source.
+     * @param bool $deleteold Whether to delete old files. Default is false.
+     */
+    public static function import_files_from_directory(stored_file $directory, int $sourceid, bool $deleteold = false) {
+        global $DB;
+        $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
+
+        $fs = get_file_storage();
         if (!$directory->is_directory()) {
             throw new moodle_exception('not_a_directory', 'repository_imagehub');
-        } 
+        }
+
+        $files = $fs->get_directory_files(
+            $directory->get_contextid(),
+            $directory->get_component(),
+            $directory->get_filearea(),
+            $directory->get_itemid(),
+            $directory->get_filepath(),
+            true,
+            true
+        );
+        $targetdirname = str_replace($source->dirname, '', $directory->get_filepath());
+        $targetdirname = $source->dirname . ltrim($targetdirname, '/');
+        foreach ($files as $file) {
+            $targetfile = $fs->get_file(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0, $source->dirname, $file->get_filename());
+            if (!$targetfile) {
+                $targetfile = $fs->create_file_from_storedfile([
+                    'contextid' => CONTEXT_SYSTEM,
+                    'component' => 'repository_imagehub',
+                    'filearea' => 'images',
+                    'itemid' => 0,
+                    'filepath' => $targetdirname,
+                    'filename' => $file->get_filename(),
+                ], $file);
+            } else {
+                $targetfile->replace_file_with($file);
+            }
+        }
     }
 
     public static function import_files_from_git(\moodle_url $gitrepository) {
@@ -84,6 +222,6 @@ class manager {
     }
 
     public static function import_files_from_web(\moodle_url $weburl) {
-        
+
     }
 }

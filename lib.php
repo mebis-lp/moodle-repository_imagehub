@@ -157,11 +157,22 @@ class repository_imagehub extends repository {
     }
 
     // public static function get_instance_option_names() {
-    //     return ['sources'];
+    // return ['sources'];
     // }
 
     public function update_options($options = null) {
-        
         parent::update_options($options);
     }
+}
+
+/**
+ * Deliver a file from the repository.
+ */
+function repository_imagehub_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []): ?bool {
+    $fullpath = "/1/repository_imagehub/$filearea/" . implode('/', $args);
+    $fs = get_file_storage();
+    if ((!$file = $fs->get_file_by_hash(sha1($fullpath))) || $file->is_directory()) {
+        return false;
+    }
+    send_stored_file($file, 0, 0, false, $options);
 }
