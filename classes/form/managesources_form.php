@@ -18,6 +18,9 @@ namespace repository_imagehub\form;
 
 use core_form\dynamic_form;
 
+defined('MOODLE_INTERNAL') || die();
+
+require_once('../../lib.php');
 /**
  * Class managesources
  *
@@ -31,7 +34,7 @@ class managesources_form extends dynamic_form {
         $mform =& $this->_form;
 
         $mform->addElement('hidden', 'id');
-        $mform->setType('id', PARAM_INT);        
+        $mform->setType('id', PARAM_INT);
 
         $mform->addElement('text', 'title', get_string('sourcetitle', 'repository_imagehub'), ['size' => '100']);
         $mform->setType('title', PARAM_TEXT);
@@ -39,10 +42,8 @@ class managesources_form extends dynamic_form {
         $mform->addElement('text', 'url', get_string('sourceurl', 'repository_imagehub'), ['size' => '1333']);
         $mform->setType('title', PARAM_URL);
 
-        $mform->addElement('text', 'dirname', get_string('sourcedirname', 'repository_imagehub'), ['size' => '100']);
-        $mform->setType('title', PARAM_TEXT);
-
-        $mform->addElement('text', 'type', get_string('sourcetype', 'repository_imagehub'), ['size' => '100']);
+        $options = [\repository_imagehub::SOURCE_TYPE_MANUAL, \repository_imagehub::SOURCE_TYPE_ZIP];
+        $mform->addElement('select', 'type', get_string('sourcetype', 'repository_imagehub'), $options);
         $mform->setType('title', PARAM_TEXT);
 
         $context = $this->get_context_for_dynamic_submission();
@@ -56,9 +57,9 @@ class managesources_form extends dynamic_form {
     protected function get_context_for_dynamic_submission(): \context {
         return \context_system::instance();
     }
-    
+
     /**
-     * 
+     *
      * Checks if current user has sufficient permissions, otherwise throws exception
      */
     protected function check_access_for_dynamic_submission(): void {

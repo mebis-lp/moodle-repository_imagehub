@@ -23,11 +23,13 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require('../../config.php');
+ require('../../config.php');
+ require('./lib.php');
 
 require_login();
 
 $sourceid = required_param('sourceid', PARAM_INT);
+$sourcetype = optional_param('type', '', PARAM_TEXT);
 
 $url = new moodle_url('/repository/imagehub/managefiles.php', []);
 $PAGE->set_url($url);
@@ -42,7 +44,11 @@ $fs = get_file_storage();
 
 $tree = $fs->get_area_files(CONTEXT_SYSTEM, 'repository_imagehub', 'images', $sourceid);
 
-$managefilesform = new \repository_imagehub\form\managefiles_form();
+if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP) {
+    $managefilesform = new \repository_imagehub\form\managefiles_zip_form();
+} else {
+    $managefilesform = new \repository_imagehub\form\managefiles_form();
+}
 
 if ($managefilesform->is_submitted()) {
     $data = $managefilesform->get_data();

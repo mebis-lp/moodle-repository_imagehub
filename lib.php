@@ -42,6 +42,16 @@ require_once($CFG->dirroot . '/repository/lib.php');
 class repository_imagehub extends repository {
 
     /**
+     * Type zip in select for source.
+     */
+    public const SOURCE_TYPE_ZIP = 'zip';
+
+    /**
+     * Type manual in select for source.
+     */
+    public const SOURCE_TYPE_MANUAL = 'manual';
+
+    /**
      * Given a path, and perhaps a search, get a list of files.
      *
      * See details on {@link http://docs.moodle.org/dev/Repository_plugins}

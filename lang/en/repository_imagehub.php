@@ -42,7 +42,6 @@ $string['pluginname'] = 'Imagehub';
 $string['privacy:metadata'] = 'The Imagehub plugin doesn\'t store any personal data.';
 $string['sourcetitle'] = 'Title';
 $string['sourceurl'] = 'Url';
-$string['sourcedirname'] = 'Directory';
 $string['sourcetype'] = 'Type';
 $string['tagarea_repository_imagehub'] = 'Repository imagehug';
 $string['tagcollection_repository_imagehub_standard_collection'] = 'Tagcollection repository imagehub standard collection';
