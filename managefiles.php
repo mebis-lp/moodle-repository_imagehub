@@ -40,10 +40,15 @@ $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*
 
 $fs = get_file_storage();
 
-$tree = $fs->get_directory_files(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0, $source->dirname);
+$tree = $fs->get_area_files(CONTEXT_SYSTEM, 'repository_imagehub', 'images', $sourceid);
 
 $managefilesform = new \repository_imagehub\form\managefiles_form();
 
+if ($managefilesform->is_submitted()) {
+    $data = $managefilesform->get_data();
+    $draftitemid = file_get_submitted_draft_itemid('files');
+    file_save_draft_area_files($draftitemid, context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
+}
 $managefilesform->display();
 
 echo $OUTPUT->footer();

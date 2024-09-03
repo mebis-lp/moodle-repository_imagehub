@@ -16,6 +16,7 @@
 
 namespace repository_imagehub\form;
 
+use core\param;
 use moodleform;
 
 /**
@@ -29,6 +30,8 @@ use moodleform;
 class managefiles_form extends moodleform {
     public function definition() {
         $mform = $this->_form;
+
+        $mform->addElement('hidden', 'sourceid', required_param('sourceid', PARAM_INT));
 
         $mform->addElement('filemanager', 'files', get_string('files'), null, [
             'subdirs' => 1,
@@ -49,5 +52,26 @@ class managefiles_form extends moodleform {
         );
 
         $this->add_action_buttons();
+    }
+
+    /**
+     * Processes the form data before loading the form. Adds the default values for empty forms, replaces the CSS
+     * with the values for editing.
+     *
+     * @param array $defaultvalues
+     * @return void
+     */
+    public function data_preprocessing(&$defaultvalues): void {
+        $draftitemid = file_get_submitted_draft_itemid('files');
+
+        file_prepare_draft_area(
+            $draftitemid,
+            CONTEXT_SYSTEM,
+            'repository_imagehub',
+            'images',
+            0,
+            ['subdirs' => 1, 'maxfiles' => -1]
+        );
+        $defaultvalues['files'] = $draftitemid;
     }
 }

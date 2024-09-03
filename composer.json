@@ -1,5 +1,5 @@
 {
     "require": {
-        "symfony/yaml": "^7.1"
+        "dallgoot/yaml": "^0.9.1"
     }
 }

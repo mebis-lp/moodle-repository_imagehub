@@ -35,7 +35,6 @@ function xmldb_repository_imagehub_install() {
     $DB->insert_record('repository_imagehub_sources', [
         'title' => 'Manual',
         'type' => 'manual',
-        'dirname' => '/manual/',
         'timemodified' => time(),
         'lastupdate' => time(),
     ]);

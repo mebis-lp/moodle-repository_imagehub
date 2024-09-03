@@ -19,7 +19,7 @@ namespace repository_imagehub;
 use core_tag_tag;
 use moodle_exception;
 use stored_file;
-use Symfony\Component\Yaml\Yaml;
+use Dallgoot\Yaml\Yaml;
 
 /**
  * Class manager
@@ -33,10 +33,11 @@ class manager {
     /**
      * Add a file to the repository.
      * @param stored_file $file
+     * @param string $filepath The path of the file.
      * @param int $source The id of the source.
      * @param array $metadata
      */
-    public static function add_item(stored_file $file, int $sourceid, array $metadata = []) {
+    public static function add_item(stored_file $file, string $filepath, int $sourceid, array $metadata = []) {
         global $DB;
         $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
         $fs = get_file_storage();
@@ -44,8 +45,8 @@ class manager {
             'contextid' => CONTEXT_SYSTEM,
             'component' => 'repository_imagehub',
             'filearea' => 'images',
-            'itemid' => 0,
-            'filepath' => $source->dirname,
+            'itemid' => $sourceid,
+            'filepath' => $filepath,
             'filename' => $file->get_filename(),
         ];
 
@@ -123,9 +124,9 @@ class manager {
         global $DB;
         $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
         $fs = get_file_storage();
-        $files = $fs->get_directory_files(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0, $source->dirname);
+        $files = $fs->get_area_files(CONTEXT_SYSTEM, 'repository_imagehub', 'images', $sourceid);
         foreach ($files as $file) {
-            if ($file->filename == 'metadata.yml') {
+            if ($file->get_filename() == 'metadata.yml') {
                 $metadata = Yaml::parse($file->get_content());
                 $imagefile = $fs->get_file(
                     $file->contextid,
@@ -166,10 +167,10 @@ class manager {
 
         $fp = get_file_packer('application/zip');
         $itemid = time();
-        $zip->extract_to_storage($fp, \context_system::instance(), 'repository_imagehub', 'temp', $itemid, $source->dirname);
+        $zip->extract_to_storage($fp, \context_system::instance(), 'repository_imagehub', 'temp', $sourceid, '/');
 
         $fs = get_file_storage();
-        $directory = $fs->get_file(CONTEXT_SYSTEM, 'repository_imagehub', 'temp', $itemid, $source->dirname, '.');
+        $directory = $fs->get_file(CONTEXT_SYSTEM, 'repository_imagehub', 'temp', $sourceid, '/', '.');
 
         self::import_files_from_directory($directory, $sourceid, $deleteold);
     }
@@ -198,21 +199,33 @@ class manager {
             true,
             true
         );
-        $targetdirname = str_replace($source->dirname, '', $directory->get_filepath());
-        $targetdirname = $source->dirname . ltrim($targetdirname, '/');
+
         foreach ($files as $file) {
-            $targetfile = $fs->get_file(CONTEXT_SYSTEM, 'repository_imagehub', 'images', 0, $source->dirname, $file->get_filename());
+            $targetfile = $fs->get_file(
+                CONTEXT_SYSTEM,
+                'repository_imagehub',
+                'images',
+                $sourceid,
+                $file->get_filepath(),
+                $file->get_filename()
+            );
             if (!$targetfile) {
                 $targetfile = $fs->create_file_from_storedfile([
                     'contextid' => CONTEXT_SYSTEM,
                     'component' => 'repository_imagehub',
                     'filearea' => 'images',
                     'itemid' => 0,
-                    'filepath' => $targetdirname,
+                    'filepath' => $file->get_filepath(),
                     'filename' => $file->get_filename(),
                 ], $file);
+                $DB->insert_record('repository_imagehub', [
+                    'fileid' => $targetfile->get_id(),
+                    'source' => $sourceid,
+                ]);
             } else {
-                $targetfile->replace_file_with($file);
+                if ($targetfile->get_contenthash() != $file->get_contenthash()) {
+                    $targetfile->replace_file_with($file);
+                }
             }
         }
     }

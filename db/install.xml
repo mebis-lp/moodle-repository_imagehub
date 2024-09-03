@@ -20,7 +20,6 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="title" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="url" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="dirname" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="type" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="lastupdate" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
