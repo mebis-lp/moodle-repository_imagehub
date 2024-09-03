@@ -36,6 +36,7 @@ echo $OUTPUT->header();
 
 $sources = array_values($DB->get_records('repository_imagehub_sources'));
 
+$PAGE->requires->js_call_amd('repository_imagehub/managesources', 'init');
 echo($OUTPUT->render_from_template('repository_imagehub/managesources', [
     'sources' => $sources,
 ]));

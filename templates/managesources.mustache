@@ -24,22 +24,40 @@
     }
 }}
 <div>
-    {{#sources}}
-    <div class="row">    
-        <div class="col">
-            {{title}}
-        </div>
-        <div class="col">
-            {{type}}
-        </div>
-        <div class="col">
-            {{#str}}edit{{/str}}
-            {{#str}}delete{{/str}}
+    <div class="row">
+        <div class="col pb-4">
+            <a id="addsource" class="btn btn-primary btn-link" href="#">
+                {{#str}} addsource, repository_imagehub {{/str}}
+            </a>
         </div>
         <div class="col">
             {{#str}}manage_files, repository_imagehub{{/str}}
         </div>
     </div>
-    {{/sources}}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">{{#str}} sourcetitle, repository_imagehub {{/str}}</th>
+                <th scope="col">{{#str}} sourcetype, repository_imagehub {{/str}}</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#sources}}
+            <tr sourceid={{id}}>
+                <td>{{title}}</td>
+                <td>{{type}}</td>
+                <td>
+                    <a class="edit" href="#" data-id={{id}}>
+                        {{#pix}} t/edit, core, {{#str}} edit {{/str}}{{/pix}}
+                    </a>
+                    <a class="delete" href="#" data-id={{id}} data-title={{title}}>
+                        {{#pix}} t/delete, core, {{#str}} delete {{/str}}{{/pix}}
+                    </a>
+                </td>
+            </tr>
+            {{/sources}}
+        </tbody>
+    </table>
 </div>
 

@@ -15,34 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Capability definitions for Imagehub
+ * External functions and service declaration for Imagehub
  *
- * Documentation: {@link https://moodledev.io/docs/apis/subsystems/access}
+ * Documentation: {@link https://moodledev.io/docs/apis/subsystems/external/description}
  *
  * @package    repository_imagehub
- * @category   access
- * @copyright  2024 ISB Bayern
- * @author     Stefan Hanauska <stefan.hanauska@csg-in.de>
+ * @category   webservice
+ * @copyright  2024 Tobias Garske, ISB Bayern
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = [
-
-    'repository/imagehub:view' => [
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_COURSE,
-        'archetypes' => [
-            'user' => CAP_ALLOW,
-        ],
-    ],
-    'repository/imagehub:managerepositories' => [
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => [
-            'user' => CAP_PROHIBIT,
-            'admin' => CAP_ALLOW,
-        ],
+$functions = [
+    'repository_imagehub_delete_source' => [
+        'classname'     => 'repository_imagehub\external\delete_source',
+        'methodname'    => 'execute',
+        'description'   => 'Delete source.',
+        'type'          => 'write',
+        'ajax'          => true,
+        'capabilities'  => '', // TODO add cap
     ],
 ];

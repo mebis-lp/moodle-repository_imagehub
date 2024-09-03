@@ -127,7 +127,14 @@ class repository_imagehub extends repository {
      * Get the configuration form for this repository type.
      */
     public static function type_config_form($mform, $classname = 'repository_imagehub') {
-        $mform->addElement('static', null, '', 'Test');
+        // Link to managesources.
+        $url = new moodle_url('/repository/imagehub/managesources.php');
+        $mform->addElement(
+            'static',
+            null,
+            get_string('linktomanagesources', 'repository_imagehub', $url),
+            get_string('linktomanagesources_description', 'repository_imagehub')
+        );
     }
 
     /**

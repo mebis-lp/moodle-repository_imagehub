@@ -26,12 +26,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['addsource'] = 'Add source';
 $string['configplugin'] = 'Imagehub repository type configuration';
+$string['delete'] = 'Delete source {$a}';
+$string['deletewarning'] = 'Are you sure you want to delete this Conversation.';
+$string['editsource'] = 'Edit source';
+$string['imagehub:managerepositories'] = 'Manage Imagehub sources';
 $string['imagehub:view'] = 'View Imagehub repository';
 $string['manage_files'] = 'Manage files';
+$string['linktomanagesources'] = '<a href="{$a}">Manage Repository</a>';
+$string['linktomanagesources_description'] = 'Manage and add new images';
 $string['managefiles'] = 'Manage files';
 $string['managesources'] = 'Manage sources';
 $string['pluginname'] = 'Imagehub';
 $string['privacy:metadata'] = 'The Imagehub plugin doesn\'t store any personal data.';
+$string['sourcetitle'] = 'Title';
+$string['sourceurl'] = 'Url';
+$string['sourcedirname'] = 'Directory';
+$string['sourcetype'] = 'Type';
 $string['tagarea_repository_imagehub'] = 'Repository imagehug';
 $string['tagcollection_repository_imagehub_standard_collection'] = 'Tagcollection repository imagehub standard collection';
