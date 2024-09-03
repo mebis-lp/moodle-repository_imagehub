@@ -24,7 +24,7 @@
  */
 
  require('../../config.php');
- require('./lib.php');
+ require_once('./lib.php');
 
 require_login();
 

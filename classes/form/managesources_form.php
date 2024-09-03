@@ -20,7 +20,7 @@ use core_form\dynamic_form;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once('../../lib.php');
+require_once($CFG->dirroot . '/repository/imagehub/lib.php');
 /**
  * Class managesources
  *
