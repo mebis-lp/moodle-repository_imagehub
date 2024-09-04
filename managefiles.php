@@ -44,7 +44,7 @@ $fs = get_file_storage();
 
 $tree = $fs->get_area_files(context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
 
-if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
+if ($sourcetype == \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
     $managefilesform = new \repository_imagehub\form\managefiles_zip_form();
 } else {
     $managefilesform = new \repository_imagehub\form\managefiles_form();

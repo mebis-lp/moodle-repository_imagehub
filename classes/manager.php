@@ -166,10 +166,10 @@ class manager {
         $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
 
         $fp = get_file_packer('application/zip');
-        $zip->extract_to_storage($fp, \context_system::instance(), 'repository_imagehub', 'temp', $sourceid, '/');
+        $zip->extract_to_storage($fp, \context_system::instance()->id, 'repository_imagehub', 'temp', $sourceid, '/');
 
         $fs = get_file_storage();
-        $directory = $fs->get_file(context_system::instance()->id, 'repository_imagehub', 'temp', $sourceid, '/', '.');
+        $directory = $fs->get_file(\context_system::instance()->id, 'repository_imagehub', 'temp', $sourceid, '/', '.');
 
         self::import_files_from_directory($directory, $sourceid, $deleteold);
     }
@@ -196,12 +196,12 @@ class manager {
             $directory->get_itemid(),
             $directory->get_filepath(),
             true,
-            true
+            false
         );
 
         foreach ($files as $file) {
             $targetfile = $fs->get_file(
-                context_system::instance()->id,
+                \context_system::instance()->id,
                 'repository_imagehub',
                 'images',
                 $sourceid,
@@ -210,7 +210,7 @@ class manager {
             );
             if (!$targetfile) {
                 $targetfile = $fs->create_file_from_storedfile([
-                    'contextid' => context_system::instance()->id,
+                    'contextid' => \context_system::instance()->id,
                     'component' => 'repository_imagehub',
                     'filearea' => 'images',
                     'itemid' => 0,
