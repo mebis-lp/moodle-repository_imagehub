@@ -166,7 +166,6 @@ class manager {
         $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
 
         $fp = get_file_packer('application/zip');
-        $itemid = time();
         $zip->extract_to_storage($fp, \context_system::instance(), 'repository_imagehub', 'temp', $sourceid, '/');
 
         $fs = get_file_storage();

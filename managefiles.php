@@ -51,14 +51,26 @@ if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
 }
 
 if ($managefilesform->is_submitted()) {
-    $data = $managefilesform->get_data();
-    $draftitemid = file_get_submitted_draft_itemid('files');
-    if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
-        file_get_drafarea_files($draftitemid);
+    if ($managefilesform->is_cancelled()) {
+        redirect(new moodle_url('/repository/imagehub/managesources.php'));
     } else {
-        file_save_draft_area_files($draftitemid, \context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
+        $data = $managefilesform->get_data();
+        $draftitemid = file_get_submitted_draft_itemid('files');
+        if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
+            file_get_drafarea_files($draftitemid);
+        } else {
+            file_save_draft_area_files(
+                $draftitemid,
+                \context_system::instance()->id,
+                'repository_imagehub',
+                'images',
+                $sourceid,
+                ['subdirs' => 1, 'maxfiles' => -1, 'accepted_types' => 'web_image']
+            );
+        }
     }
 }
+
 $managefilesform->display();
 
 // Backlink.

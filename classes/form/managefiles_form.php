@@ -16,7 +16,6 @@
 
 namespace repository_imagehub\form;
 
-use core\param;
 use moodleform;
 
 /**
@@ -28,28 +27,21 @@ use moodleform;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class managefiles_form extends moodleform {
+    /** @var int $sourceid */
+    private int $sourceid;
+
     public function definition() {
+        $this->sourceid = required_param('sourceid', PARAM_INT);
         $mform = $this->_form;
 
-        $mform->addElement('hidden', 'sourceid', required_param('sourceid', PARAM_INT));
+        $mform->addElement('hidden', 'sourceid', $this->sourceid);
+        $mform->setType('sourceid', PARAM_INT);
 
         $mform->addElement('filemanager', 'files', get_string('files'), null, [
             'subdirs' => 1,
             'maxbytes' => 0,
-            'maxfiles' => -1,
-            'accepted_types' => ['web_image'],
+            'accepted_types' => 'web_image',
         ]);
-
-        $mform->addElement(
-            'tags',
-            'tags',
-            get_string('tags'),
-            [
-                'itemtype' => 'repository_imagehub',
-                'component' => 'repository_imagehub',
-                'collection' => 'repository_imagehub_standard_collection',
-            ]
-        );
 
         $this->add_action_buttons();
     }
@@ -66,11 +58,11 @@ class managefiles_form extends moodleform {
 
         file_prepare_draft_area(
             $draftitemid,
-            context_system::instance()->id,
+            \context_system::instance()->id,
             'repository_imagehub',
             'images',
-            0,
-            ['subdirs' => 1, 'maxfiles' => -1]
+            $this->sourceid,
+            ['subdirs' => 1]
         );
         $defaultvalues['files'] = $draftitemid;
     }

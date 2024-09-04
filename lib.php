@@ -80,19 +80,39 @@ class repository_imagehub extends repository {
         return $ret;
     }
 
+    /**
+     * Get a list of files.
+     * @param string $path
+     * @param string $page
+     * @param string $search
+     * @return array
+     */
     public function get_file_list($path = '', $page = '', $search = ''): array {
         global $DB, $OUTPUT;
-
+        $sourceids = $DB->get_fieldset('repository_imagehub_sources', 'id');
         $filelist = [];
 
         $fs = get_file_storage();
-        // Only manual files for now, needs to be changed as soon as there are other sources.
-        $files = $fs->get_directory_files(context_system::instance()->id, 'repository_imagehub', 'images', 1, '/', true, true);
+        $files = [];
+        foreach ($sourceids as $sourceid) {
+            $files = array_merge(
+                $files,
+                $fs->get_directory_files(
+                    context_system::instance()->id,
+                    'repository_imagehub',
+                    'images',
+                    $sourceid,
+                    '/',
+                    true,
+                    false
+                )
+            );
+        }
         $results = $DB->get_records('repository_imagehub', null, '', 'fileid, title');
         foreach ($files as $file) {
             $node['thumbnail'] = $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false);
             $filelistentry = [
-                'title' => $results[$file->id] ?? $file->get_filename(),
+                'title' => $results[$file->id]->title ?? $file->get_filename(),
                 'size' => $file->get_filesize(),
                 'filename' => $file->get_filename(),
                 'thumbnail' => $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false),
@@ -271,7 +291,7 @@ class repository_imagehub extends repository {
     public function file_is_accessible($fileid) {
         $fs = get_file_storage();
         $file = $fs->get_file_by_id($fileid);
-        return $file->get_component() === 'repository_imagehub';
+        return $file->get_component() == 'repository_imagehub';
     }
 }
 
