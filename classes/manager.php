@@ -42,7 +42,7 @@ class manager {
         $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
         $fs = get_file_storage();
         $filerecord = [
-            'contextid' => CONTEXT_SYSTEM,
+            'contextid' => context_system::instance()->id,
             'component' => 'repository_imagehub',
             'filearea' => 'images',
             'itemid' => $sourceid,
@@ -124,7 +124,7 @@ class manager {
         global $DB;
         $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
         $fs = get_file_storage();
-        $files = $fs->get_area_files(CONTEXT_SYSTEM, 'repository_imagehub', 'images', $sourceid);
+        $files = $fs->get_area_files(context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
         foreach ($files as $file) {
             if ($file->get_filename() == 'metadata.yml') {
                 $metadata = Yaml::parse($file->get_content());
@@ -170,7 +170,7 @@ class manager {
         $zip->extract_to_storage($fp, \context_system::instance(), 'repository_imagehub', 'temp', $sourceid, '/');
 
         $fs = get_file_storage();
-        $directory = $fs->get_file(CONTEXT_SYSTEM, 'repository_imagehub', 'temp', $sourceid, '/', '.');
+        $directory = $fs->get_file(context_system::instance()->id, 'repository_imagehub', 'temp', $sourceid, '/', '.');
 
         self::import_files_from_directory($directory, $sourceid, $deleteold);
     }
@@ -202,7 +202,7 @@ class manager {
 
         foreach ($files as $file) {
             $targetfile = $fs->get_file(
-                CONTEXT_SYSTEM,
+                context_system::instance()->id,
                 'repository_imagehub',
                 'images',
                 $sourceid,
@@ -211,7 +211,7 @@ class manager {
             );
             if (!$targetfile) {
                 $targetfile = $fs->create_file_from_storedfile([
-                    'contextid' => CONTEXT_SYSTEM,
+                    'contextid' => context_system::instance()->id,
                     'component' => 'repository_imagehub',
                     'filearea' => 'images',
                     'itemid' => 0,

@@ -66,7 +66,7 @@ class managefiles_form extends moodleform {
 
         file_prepare_draft_area(
             $draftitemid,
-            CONTEXT_SYSTEM,
+            context_system::instance()->id,
             'repository_imagehub',
             'images',
             0,

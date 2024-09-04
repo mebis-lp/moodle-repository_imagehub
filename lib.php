@@ -83,21 +83,34 @@ class repository_imagehub extends repository {
     }
 
     public function get_file_list($path = '', $page = '', $search = ''): array {
-        global $DB;
+        global $DB, $OUTPUT;
 
         $filelist = [];
 
         $fs = get_file_storage();
         // Only manual files for now, needs to be changed as soon as there are other sources.
-        $files = $fs->get_directory_files(context_system::instance()->id, 'repository_imagehub', 'image', 0, '/manual/', true, true);
+        $files = $fs->get_directory_files(context_system::instance()->id, 'repository_imagehub', 'images', 1, '/', true, true);
         $results = $DB->get_records('repository_imagehub', null, '', 'fileid, title');
         foreach ($files as $file) {
-            $filelist[] = [
+            $node['thumbnail'] = $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false);
+            $filelistentry = [
                 'title' => $results[$file->id] ?? $file->get_filename(),
                 'size' => $file->get_filesize(),
+                'filename' => $file->get_filename(),
+                'thumbnail' => $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false),
+                'icon' => $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false),
+                'source' => $file->get_id(),
             ];
+
+            if ($imageinfo = @getimagesizefromstring($file->get_content())) {
+                $filelistentry['realthumbnail'] = $this->get_thumbnail_url($file, 'thumb')->out(false);
+                $filelistentry['realicon'] = $this->get_thumbnail_url($file, 'icon')->out(false);
+                $filelistentry['image_width'] = $imageinfo[0];
+                $filelistentry['image_height'] = $imageinfo[1];
+            }
+            $filelist[] = $filelistentry;
         }
-        return $files;
+        return $filelist;
     }
 
     /**
@@ -180,16 +193,108 @@ class repository_imagehub extends repository {
     public function update_options($options = null) {
         parent::update_options($options);
     }
+
+    /**
+     * Returns url of thumbnail file.
+     *
+     * @param string $filepath current path in repository (dir and filename)
+     * @param string $thumbsize 'thumb' or 'icon'
+     * @return moodle_url
+     */
+    protected static function get_thumbnail_url($file, $thumbsize) {
+        return moodle_url::make_pluginfile_url(
+            context_system::instance()->id,
+            'repository_imagehub',
+            $thumbsize,
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename()
+        );
+    }
+
+    /**
+     * Returns thumbnail file.
+     *
+     * @param stored_file $file
+     * @param string $thumbsize 'thumb' or 'icon'
+     * @return stored_file|null
+     */
+    public static function get_thumbnail($file, $thumbsize) {
+        global $CFG;
+        $filecontents = $file->get_content();
+
+        $fs = get_file_storage();
+        if (!($thumbfile = $fs->get_file(
+            context_system::instance()->id,
+            'repository_imagehub',
+            $thumbsize,
+            $file->get_itemid(),
+            $file->get_filepath(),
+            $file->get_filename()))
+            ) {
+
+            require_once($CFG->libdir . '/gdlib.php');
+            if ($thumbsize === 'thumb') {
+                $size = 90;
+            } else {
+                $size = 24;
+            }
+            if (!$data = generate_image_thumbnail_from_string($filecontents, $size, $size)) {
+                return null;
+            }
+            $record = [
+                'contextid' => context_system::instance()->id,
+                'component' => 'repository_imagehub',
+                'filearea' => $thumbsize,
+                'itemid' => $file->get_itemid(),
+                'filepath' => $file->get_filepath(),
+                'filename' => $file->get_filename(),
+            ];
+            $thumbfile = $fs->create_file_from_string($record, $data);
+        }
+        return $thumbfile;
+    }
+
+    public function get_file_reference($fileid) {
+        $fs = get_file_storage();
+        $file = $fs->get_file_by_id($fileid);
+        $filerecord = [
+            'component' => $file->get_component(),
+            'filearea'  => $file->get_filearea(),
+            'itemid'    => $file->get_itemid(),
+            'author'    => $file->get_author(),
+            'filepath'  => $file->get_filepath(),
+            'filename'  => $file->get_filename(),
+            'contextid' => $file->get_contextid(),
+        ];
+        return file_storage::pack_reference($filerecord);
+    }
+
+    public function file_is_accessible($fileid) {
+        $fs = get_file_storage();
+        $file = $fs->get_file_by_id($fileid);
+        return $file->get_component() === 'repository_imagehub';
+    }
 }
 
 /**
  * Deliver a file from the repository.
  */
 function repository_imagehub_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []): ?bool {
-    $fullpath = "/1/repository_imagehub/$filearea/" . implode('/', $args);
+    global $OUTPUT;
+    $fullpath = "/1/repository_imagehub/images/" . implode('/', $args);
     $fs = get_file_storage();
     if ((!$file = $fs->get_file_by_hash(sha1($fullpath))) || $file->is_directory()) {
         return false;
     }
+
+    if ($filearea === 'thumb' || $filearea === 'icon') {
+        if (!($file = repository_imagehub::get_thumbnail($file, $filearea))) {
+            // Generation failed, redirect to default icon for file extension.
+            // Do not use redirect() here because is not compatible with webservice/pluginfile.php.
+            header('Location: ' . $OUTPUT->image_url(file_extension_icon($file)));
+        }
+    }
+
     send_stored_file($file, 0, 0, false, $options);
 }
