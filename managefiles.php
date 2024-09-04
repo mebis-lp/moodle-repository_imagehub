@@ -57,7 +57,11 @@ if ($managefilesform->is_submitted()) {
         $data = $managefilesform->get_data();
         $draftitemid = file_get_submitted_draft_itemid('files');
         if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
-            file_get_drafarea_files($draftitemid);
+            $draftarea = file_get_drafarea_files($draftitemid);
+            if (count($draftarea->list) == 1) {
+                $zipfile = $fs->get_file_by_id($draftarea->list[0]->id);
+                \repository_imagehub\manager::import_files_from_zip($zipfile, $sourceid);
+            }
         } else {
             file_save_draft_area_files(
                 $draftitemid,
@@ -71,7 +75,7 @@ if ($managefilesform->is_submitted()) {
     }
 }
 
-$data = $managefilesform->get_data();
+$data = (array)$managefilesform->get_data();
 $managefilesform->data_preprocessing($data);
 $managefilesform->set_data($data);
 $managefilesform->display();
