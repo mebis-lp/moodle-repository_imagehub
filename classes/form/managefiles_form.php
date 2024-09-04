@@ -30,6 +30,9 @@ class managefiles_form extends moodleform {
     /** @var int $sourceid */
     private int $sourceid;
 
+    /**
+     * Defines the form elements
+     */
     public function definition() {
         $this->sourceid = required_param('sourceid', PARAM_INT);
         $mform = $this->_form;

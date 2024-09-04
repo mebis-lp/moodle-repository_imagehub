@@ -71,6 +71,9 @@ if ($managefilesform->is_submitted()) {
     }
 }
 
+$data = $managefilesform->get_data();
+$managefilesform->data_preprocessing($data);
+$managefilesform->set_data($data);
 $managefilesform->display();
 
 // Backlink.
