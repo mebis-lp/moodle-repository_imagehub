@@ -24,6 +24,7 @@
  */
 
 require('../../config.php');
+require_once('./lib.php');
 
 require_login();
 
@@ -35,6 +36,15 @@ $PAGE->set_heading(get_string('managesources', 'repository_imagehub'));
 echo $OUTPUT->header();
 
 $sources = array_values($DB->get_records('repository_imagehub_sources'));
+
+// Map type. 
+$mapping = [
+    \repository_imagehub::SOURCE_TYPE_ZIP_VALUE => \repository_imagehub::SOURCE_TYPE_ZIP,
+    \repository_imagehub::SOURCE_TYPE_MANUAL_VALUE => \repository_imagehub::SOURCE_TYPE_MANUAL,
+];
+foreach ($sources as $key => $value) {
+    $sources[$key]->type = $mapping[$value->type];
+}
 
 $PAGE->requires->js_call_amd('repository_imagehub/managesources', 'init');
 echo($OUTPUT->render_from_template('repository_imagehub/managesources', [
