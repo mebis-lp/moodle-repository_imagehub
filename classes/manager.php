@@ -213,7 +213,7 @@ class manager {
                     'contextid' => \context_system::instance()->id,
                     'component' => 'repository_imagehub',
                     'filearea' => 'images',
-                    'itemid' => 0,
+                    'itemid' => $file->get_itemid(),
                     'filepath' => $file->get_filepath(),
                     'filename' => $file->get_filename(),
                 ], $file);

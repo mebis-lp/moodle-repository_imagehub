@@ -110,6 +110,9 @@ class repository_imagehub extends repository {
         }
         $results = $DB->get_records('repository_imagehub', null, '', 'fileid, title');
         foreach ($files as $file) {
+            if (!str_starts_with($file->get_mimetype(), 'image')) {
+                continue;
+            }
             $node['thumbnail'] = $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false);
             $filelistentry = [
                 'title' => $results[$file->id]->title ?? $file->get_filename(),
@@ -120,7 +123,12 @@ class repository_imagehub extends repository {
                 'source' => $file->get_id(),
             ];
 
-            if ($imageinfo = @getimagesizefromstring($file->get_content())) {
+            if ($file->get_mimetype() == 'image/svg+xml' ) {
+                $filelistentry['realthumbnail'] = $this->get_thumbnail_url($file, 'thumb')->out(false);
+                $filelistentry['realicon'] = $this->get_thumbnail_url($file, 'icon')->out(false);
+                $filelistentry['image_width'] = 100;
+                $filelistentry['image_height'] = 100;
+            } else if ($imageinfo = @getimagesizefromstring($file->get_content())) {
                 $filelistentry['realthumbnail'] = $this->get_thumbnail_url($file, 'thumb')->out(false);
                 $filelistentry['realicon'] = $this->get_thumbnail_url($file, 'icon')->out(false);
                 $filelistentry['image_width'] = $imageinfo[0];
@@ -307,10 +315,15 @@ function repository_imagehub_pluginfile($course, $cm, $context, $filearea, $args
     }
 
     if ($filearea === 'thumb' || $filearea === 'icon') {
-        if (!($file = repository_imagehub::get_thumbnail($file, $filearea))) {
-            // Generation failed, redirect to default icon for file extension.
-            // Do not use redirect() here because is not compatible with webservice/pluginfile.php.
-            header('Location: ' . $OUTPUT->image_url(file_extension_icon($file)));
+        if (str_ends_with($fullpath, '.svg')) {
+            // SVG files are not resized.
+            $file = $fs->get_file_by_hash(sha1($fullpath));
+        } else {
+            if (!($file = repository_imagehub::get_thumbnail($file, $filearea))) {
+                // Generation failed, redirect to default icon for file extension.
+                // Do not use redirect() here because is not compatible with webservice/pluginfile.php.
+                header('Location: ' . $OUTPUT->image_url(file_extension_icon($file)));
+            }
         }
     }
 
