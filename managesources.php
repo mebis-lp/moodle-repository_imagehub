@@ -37,7 +37,7 @@ echo $OUTPUT->header();
 
 $sources = array_values($DB->get_records('repository_imagehub_sources'));
 
-// Map type. 
+// Map type.
 $mapping = [
     \repository_imagehub::SOURCE_TYPE_ZIP_VALUE => \repository_imagehub::SOURCE_TYPE_ZIP,
     \repository_imagehub::SOURCE_TYPE_MANUAL_VALUE => \repository_imagehub::SOURCE_TYPE_MANUAL,
