@@ -42,14 +42,12 @@ require_once($CFG->dirroot . '/repository/lib.php');
 class repository_imagehub extends repository {
 
     /**
-     * Type zip in select for source.
-     */
-    public const SOURCE_TYPE_ZIP = 'zip';
-
-    /**
-     * Type manual in select for source.
+     * Values for the sourcetype select input.
      */
     public const SOURCE_TYPE_MANUAL = 'manual';
+    public const SOURCE_TYPE_MANUAL_VALUE = '0';
+    public const SOURCE_TYPE_ZIP = 'zip';
+    public const SOURCE_TYPE_ZIP_VALUE = '1';
 
     /**
      * Given a path, and perhaps a search, get a list of files.

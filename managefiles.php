@@ -44,7 +44,7 @@ $fs = get_file_storage();
 
 $tree = $fs->get_area_files(context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
 
-if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP) {
+if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
     $managefilesform = new \repository_imagehub\form\managefiles_zip_form();
 } else {
     $managefilesform = new \repository_imagehub\form\managefiles_form();
@@ -53,7 +53,11 @@ if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP) {
 if ($managefilesform->is_submitted()) {
     $data = $managefilesform->get_data();
     $draftitemid = file_get_submitted_draft_itemid('files');
-    file_save_draft_area_files($draftitemid, context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
+    if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
+        file_get_drafarea_files($draftitemid);
+    } else {
+        file_save_draft_area_files($draftitemid, \context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
+    }
 }
 $managefilesform->display();
 
