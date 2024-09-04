@@ -57,4 +57,10 @@ if ($managefilesform->is_submitted()) {
 }
 $managefilesform->display();
 
+// Backlink.
+echo($OUTPUT->render_from_template('repository_imagehub/backlink', [
+    'linkto' => new moodle_url('/repository/imagehub/managesources.php'),
+    'linktext' => get_string('backtofiles', 'repository_imagehub'),
+]));
+
 echo $OUTPUT->footer();

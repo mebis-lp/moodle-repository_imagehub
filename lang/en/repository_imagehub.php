@@ -27,6 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['addsource'] = 'Add source';
+$string['backtofiles'] = 'Back to source management';
 $string['configplugin'] = 'Imagehub repository type configuration';
 $string['delete'] = 'Delete source {$a}';
 $string['deletewarning'] = 'Are you sure you want to delete this Conversation.';
