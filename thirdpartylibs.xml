@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>vendor/dallgoot/yaml</location>
+    <name>YAML</name>
+    <license>Apache</license>
+    <licenseversion></licenseversion>
+  </library>
+</libraries>

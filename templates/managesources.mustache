@@ -1,0 +1,61 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template repository_imagehub/managesources
+
+    TODO describe template managesources
+
+    Example context (json):
+    {
+    }
+}}
+<div>
+    <div class="row">
+        <div class="col pb-4">
+            <a id="addsource" class="btn btn-primary" href="#">
+                {{#str}} addsource, repository_imagehub {{/str}}
+            </a>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">{{#str}} sourcetitle, repository_imagehub {{/str}}</th>
+                <th scope="col">{{#str}} sourcetype, repository_imagehub {{/str}}</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#sources}}
+            <tr sourceid={{id}}>
+                <td>{{title}}</td>
+                <td>{{type}}</td>
+                <td>
+                    <a class="manage" href="{{config.wwwroot}}/repository/imagehub/managefiles.php?sourceid={{id}}&type={{type}}" data-id={{id}}>
+                        {{#pix}} a/add_file, core, {{#str}} manage_files, repository_imagehub {{/str}}{{/pix}}</a>
+                    <a class="edit" href="#" data-id={{id}}>
+                        {{#pix}} t/edit, core, {{#str}} edit {{/str}}{{/pix}}</a>                    
+                    <a class="delete" href="#" data-id={{id}} data-title={{title}}>
+                        {{#pix}} t/delete, core, {{#str}} delete {{/str}}{{/pix}}
+                    </a>
+                </td>
+            </tr>
+            {{/sources}}
+        </tbody>
+    </table>
+</div>
+

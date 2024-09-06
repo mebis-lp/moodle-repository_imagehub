@@ -37,4 +37,12 @@ $capabilities = [
             'user' => CAP_ALLOW,
         ],
     ],
+    'repository/imagehub:managerepositories' => [
+        'captype' => 'write',
+        'contextlevel' => context_system::instance()->id,
+        'archetypes' => [
+            'user' => CAP_PROHIBIT,
+            'admin' => CAP_ALLOW,
+        ],
+    ],
 ];

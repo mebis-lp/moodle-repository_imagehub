@@ -1,0 +1,5 @@
+{
+    "require": {
+        "dallgoot/yaml": "^0.9.1"
+    }
+}
