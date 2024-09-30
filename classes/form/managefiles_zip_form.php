@@ -32,7 +32,6 @@ class managefiles_zip_form extends moodleform {
         $mform = $this->_form;
 
         $mform->addElement('hidden', 'sourceid', required_param('sourceid', PARAM_INT));
-        $mform->addElement('hidden', 'type', required_param('type', PARAM_INT));
 
         $mform->addElement('filemanager', 'files', get_string('files'), null, [
             'subdirs' => 0,

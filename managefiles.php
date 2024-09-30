@@ -29,7 +29,6 @@
 require_login();
 
 $sourceid = required_param('sourceid', PARAM_INT);
-$sourcetype = optional_param('type', '', PARAM_TEXT);
 
 $url = new moodle_url('/repository/imagehub/managefiles.php', []);
 $PAGE->set_url($url);
@@ -44,7 +43,7 @@ $fs = get_file_storage();
 
 $tree = $fs->get_area_files(context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
 
-if ($sourcetype == \repository_imagehub::SOURCE_TYPE_ZIP) {
+if ($source->type == \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
     $managefilesform = new \repository_imagehub\form\managefiles_zip_form();
 } else {
     $managefilesform = new \repository_imagehub\form\managefiles_form();
@@ -56,7 +55,7 @@ if ($managefilesform->is_submitted()) {
     } else {
         $data = $managefilesform->get_data();
         $draftitemid = file_get_submitted_draft_itemid('files');
-        if ($sourcetype === \repository_imagehub::SOURCE_TYPE_ZIP) {
+        if ($source->type == \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
             $draftarea = file_get_drafarea_files($draftitemid);
             if (count($draftarea->list) == 1) {
                 $zipfile = $fs->get_file_by_id($draftarea->list[0]->id);
