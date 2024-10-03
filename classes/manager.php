@@ -19,7 +19,6 @@ namespace repository_imagehub;
 use core_tag_tag;
 use moodle_exception;
 use stored_file;
-use Dallgoot\Yaml\Yaml;
 
 /**
  * Class manager
@@ -124,16 +123,16 @@ class manager {
         global $DB;
         $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
         $fs = get_file_storage();
-        $files = $fs->get_area_files(context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
+        $files = $fs->get_area_files(\context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
         foreach ($files as $file) {
-            if ($file->get_filename() == 'metadata.yml') {
-                $metadata = Yaml::parse($file->get_content());
+            if ($file->get_filename() == 'metadata.json') {
+                $metadata = json_decode($file->get_content());
                 $imagefile = $fs->get_file(
-                    $file->contextid,
-                    $file->component,
-                    $file->filearea,
-                    $file->itemid,
-                    $file->filepath,
+                    $file->get_contextid(),
+                    $file->get_component(),
+                    $file->get_filearea(),
+                    $file->get_itemid(),
+                    $file->get_filepath(),
                     $metadata->filename
                 );
                 if ($imagefile) {
@@ -172,6 +171,10 @@ class manager {
         $directory = $fs->get_file(\context_system::instance()->id, 'repository_imagehub', 'temp', $sourceid, '/', '.');
 
         self::import_files_from_directory($directory, $sourceid, $deleteold);
+
+        self::process_metadata($sourceid);
+
+        $fs->delete_area_files(\context_system::instance()->id, 'repository_imagehub', 'temp', $sourceid, '/');
     }
 
     /**
