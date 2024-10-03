@@ -33,7 +33,7 @@ class manager {
      * Add a file to the repository.
      * @param stored_file $file
      * @param string $filepath The path of the file.
-     * @param int $source The id of the source.
+     * @param int $sourceid The id of the source.
      * @param array $metadata
      */
     public static function add_item(stored_file $file, string $filepath, int $sourceid, array $metadata = []) {

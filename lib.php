@@ -174,6 +174,8 @@ class repository_imagehub extends repository {
 
     /**
      * Get the configuration form for this repository type.
+     * @param moodleform $mform
+     * @param string $classname
      */
     public static function type_config_form($mform, $classname = 'repository_imagehub') {
         // Link to managesources.
@@ -208,7 +210,7 @@ class repository_imagehub extends repository {
     /**
      * Returns url of thumbnail file.
      *
-     * @param string $filepath current path in repository (dir and filename)
+     * @param stored_file $file current path in repository (dir and filename)
      * @param string $thumbsize 'thumb' or 'icon'
      * @return moodle_url
      */
@@ -303,6 +305,14 @@ class repository_imagehub extends repository {
 
 /**
  * Deliver a file from the repository.
+ * @param stdClass $course
+ * @param stdClass $cm
+ * @param context $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options
+ * @return bool|null
  */
 function repository_imagehub_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []): ?bool {
     global $OUTPUT;

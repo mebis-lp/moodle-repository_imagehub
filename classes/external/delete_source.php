@@ -47,7 +47,7 @@ class delete_source extends external_api {
     /**
      * Execute the service.
      *
-     * @param int $contextid
+     * @param int $id
      * @return array
      * @throws invalid_parameter_exception
      * @throws dml_exception
