@@ -28,6 +28,9 @@ use moodleform;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class managefiles_zip_form extends moodleform {
+    /**
+     * Define the form
+     */
     public function definition() {
         $mform = $this->_form;
 

@@ -40,13 +40,13 @@ require_once($CFG->dirroot . '/repository/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class repository_imagehub extends repository {
-
-    /**
-     * Values for the sourcetype select input.
-     */
+    /** @var string The manual source type. */
     public const SOURCE_TYPE_MANUAL = 'manual';
+    /** @var string The value of the manual source type. */
     public const SOURCE_TYPE_MANUAL_VALUE = '0';
+    /** @var string The zip source type. */
     public const SOURCE_TYPE_ZIP = 'zip';
+    /** @var string The value of the zip source type. */
     public const SOURCE_TYPE_ZIP_VALUE = '1';
 
     /**
@@ -123,7 +123,7 @@ class repository_imagehub extends repository {
                 'source' => $file->get_id(),
             ];
 
-            if ($file->get_mimetype() == 'image/svg+xml' ) {
+            if ($file->get_mimetype() == 'image/svg+xml') {
                 $filelistentry['realthumbnail'] = $this->get_thumbnail_url($file, 'thumb')->out(false);
                 $filelistentry['realicon'] = $this->get_thumbnail_url($file, 'icon')->out(false);
                 $filelistentry['image_width'] = 100;
@@ -167,7 +167,7 @@ class repository_imagehub extends repository {
      * @throws dml_exception
      * @throws required_capability_exception
      */
-    public static function create($type, $userid, $context, $params, $readonly=0) {
+    public static function create($type, $userid, $context, $params, $readonly = 0) {
         require_capability('moodle/site:config', context_system::instance());
         return parent::create($type, $userid, $context, $params, $readonly);
     }
@@ -197,27 +197,12 @@ class repository_imagehub extends repository {
     }
 
     /**
-     * Save settings for this instance
-     */
-    public function set_options($options = []) {
-        return parent::set_options($options);
-    }
-
-    /**
      * Is this repository used to browse moodle files?
      *
      * @return boolean
      */
     public function has_moodle_files() {
         return true;
-    }
-
-    // public static function get_instance_option_names() {
-    // return ['sources'];
-    // }
-
-    public function update_options($options = null) {
-        parent::update_options($options);
     }
 
     /**
@@ -250,15 +235,16 @@ class repository_imagehub extends repository {
         $filecontents = $file->get_content();
 
         $fs = get_file_storage();
-        if (!($thumbfile = $fs->get_file(
-            context_system::instance()->id,
-            'repository_imagehub',
-            $thumbsize,
-            $file->get_itemid(),
-            $file->get_filepath(),
-            $file->get_filename()))
-            ) {
-
+        if (
+            !($thumbfile = $fs->get_file(
+                context_system::instance()->id,
+                'repository_imagehub',
+                $thumbsize,
+                $file->get_itemid(),
+                $file->get_filepath(),
+                $file->get_filename()
+            ))
+        ) {
             require_once($CFG->libdir . '/gdlib.php');
             if ($thumbsize === 'thumb') {
                 $size = 90;
@@ -281,6 +267,12 @@ class repository_imagehub extends repository {
         return $thumbfile;
     }
 
+    /**
+     * Get the file reference.
+     *
+     * @param int $fileid
+     * @return string
+     */
     public function get_file_reference($fileid) {
         $fs = get_file_storage();
         $file = $fs->get_file_by_id($fileid);
@@ -296,6 +288,12 @@ class repository_imagehub extends repository {
         return file_storage::pack_reference($filerecord);
     }
 
+    /**
+     * Return whether the file is accessible.
+     *
+     * @param string $fileid
+     * @return bool
+     */
     public function file_is_accessible($fileid) {
         $fs = get_file_storage();
         $file = $fs->get_file_by_id($fileid);

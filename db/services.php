@@ -34,6 +34,6 @@ $functions = [
         'description'   => 'Delete source.',
         'type'          => 'write',
         'ajax'          => true,
-        'capabilities'  => '', // TODO add cap
+        'capabilities'  => 'repository/imagehub:managerepositories',
     ],
 ];

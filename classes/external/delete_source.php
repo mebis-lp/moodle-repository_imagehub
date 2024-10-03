@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace repository_imagehub\external;
-
 /**
  * Class delete_source
  *
@@ -24,13 +22,17 @@ namespace repository_imagehub\external;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace repository_imagehub\external;
+
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
 
+/**
+ * Delete a source.
+ */
 class delete_source extends external_api {
-
     /**
      * Describes the parameters.
      *
@@ -73,4 +75,3 @@ class delete_source extends external_api {
         ]);
     }
 }
-

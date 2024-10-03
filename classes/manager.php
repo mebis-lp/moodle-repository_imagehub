@@ -232,11 +232,17 @@ class manager {
         }
     }
 
+    /**
+     * Import files from a git repository. Not implemented yet.
+     * @param \moodle_url $gitrepository The git repository.
+     */
     public static function import_files_from_git(\moodle_url $gitrepository) {
-
     }
 
+    /**
+     * Import files from a web url. Not implemented yet.
+     * @param \moodle_url $weburl The web url.
+     */
     public static function import_files_from_web(\moodle_url $weburl) {
-
     }
 }

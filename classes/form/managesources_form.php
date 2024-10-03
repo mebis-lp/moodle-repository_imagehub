@@ -30,6 +30,9 @@ require_once($CFG->dirroot . '/repository/imagehub/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class managesources_form extends dynamic_form {
+    /**
+     * Define the form
+     */
     public function definition() {
         $mform =& $this->_form;
 
@@ -106,7 +109,6 @@ class managesources_form extends dynamic_form {
         $context = $this->get_context_for_dynamic_submission();
         $id = $this->optional_param('id', null, PARAM_INT);
         $source = $DB->get_record('repository_imagehub_sources', ['id' => $id]);
-        // $card->title = html_entity_decode($card->title, ENT_COMPAT, 'UTF-8');
         $this->set_data($source);
     }
 
