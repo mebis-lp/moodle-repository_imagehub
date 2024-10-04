@@ -127,17 +127,23 @@ class manager {
         foreach ($files as $file) {
             if ($file->get_filename() == 'metadata.json') {
                 $metadata = json_decode($file->get_content());
-                $imagefile = $fs->get_file(
-                    $file->get_contextid(),
-                    $file->get_component(),
-                    $file->get_filearea(),
-                    $file->get_itemid(),
-                    $file->get_filepath(),
-                    $metadata->filename
-                );
-                if ($imagefile) {
-                    $item = self::get_item_from_fileid($imagefile->get_id());
-                    self::update_item($item->id, $metadata);
+                if (!is_array($metadata)) {
+                    $metadata = [$metadata];
+                }
+                
+                foreach ($metadata as $metadataitem) {
+                    $imagefile = $fs->get_file(
+                        $file->get_contextid(),
+                        $file->get_component(),
+                        $file->get_filearea(),
+                        $file->get_itemid(),
+                        $file->get_filepath(),
+                        $metadataitem->filename
+                    );
+                    if ($imagefile) {
+                        $item = self::get_item_from_fileid($imagefile->get_id());
+                        self::update_item($item->id, $metadataitem);
+                    }
                 }
                 $file->delete();
             }
