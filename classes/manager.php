@@ -126,9 +126,9 @@ class manager {
         $files = $fs->get_area_files(\context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
         foreach ($files as $file) {
             if ($file->get_filename() == 'metadata.json') {
-                $metadata = json_decode($file->get_content());
+                $metadata = json_decode($file->get_content(), true);
                 if (!is_array($metadata)) {
-                    $metadata = [$metadata];
+                    $metadata = ['images' => $metadata];
                 }
                 
                 foreach ($metadata as $metadataitem) {
@@ -138,7 +138,7 @@ class manager {
                         $file->get_filearea(),
                         $file->get_itemid(),
                         $file->get_filepath(),
-                        $metadataitem->filename
+                        $metadataitem['filename']
                     );
                     if ($imagefile) {
                         $item = self::get_item_from_fileid($imagefile->get_id());
