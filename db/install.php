@@ -32,13 +32,13 @@
  */
 function xmldb_repository_imagehub_install() {
     global $DB;
-    $DB->insert_record('repository_imagehub_sources', [
+    $recordid = $DB->insert_record('repository_imagehub_sources', [
         'title' => 'Manual',
-        'type' => 'manual',
+        'type' => repository_imagehub::SOURCE_TYPE_MANUAL_VALUE,
         'timemodified' => time(),
         'lastupdate' => time(),
     ]);
     $fs = get_file_storage();
-    $fs->create_directory(core\context\system::instance()->id, 'repository_imagehub', 'images', 0, '/manual/');
+    $fs->create_directory(core\context\system::instance()->id, 'repository_imagehub', 'images', $recordid, '/');
     return true;
 }

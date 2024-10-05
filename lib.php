@@ -139,7 +139,8 @@ class repository_imagehub extends repository {
             }
             $node['thumbnail'] = $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false);
             $filelistentry = [
-                'title' => $results[$file->get_id()]->title ?? $file->get_filename(),
+                'title' => $file->get_filename(),
+                'shorttitle' => $results[$file->get_id()]->title ?? $file->get_filename(),
                 'size' => $file->get_filesize(),
                 'filename' => $file->get_filename(),
                 'thumbnail' => $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false),
