@@ -113,6 +113,9 @@ class manager {
         if (isset($metadata['author'])) {
             $file->set_author($metadata['author']);
         }
+        if (isset($metadata['license'])) {
+            $file->set_license($metadata['license']);
+        }
     }
 
     /**
@@ -131,7 +134,7 @@ class manager {
                 if (!array_key_exists('images', $metadata)) {
                     $metadata = ['images' => [$metadata]];
                 }
-                
+
                 foreach ($metadata['images'] as $metadataitem) {
                     $imagefile = $fs->get_file(
                         $file->get_contextid(),

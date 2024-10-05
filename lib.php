@@ -84,7 +84,7 @@ class repository_imagehub extends repository {
      * Search for files.
      *
      * @param string $search_text
-     * @param integer $page
+     * @param int $page
      * @return void
      */
     public function search($search, $page = 0) {
@@ -145,6 +145,8 @@ class repository_imagehub extends repository {
                 'thumbnail' => $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false),
                 'icon' => $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false),
                 'source' => $file->get_id(),
+                'author' => $file->get_author(),
+                'license' => $file->get_license() ?? 'U',
             ];
 
             if ($file->get_mimetype() == 'image/svg+xml') {
