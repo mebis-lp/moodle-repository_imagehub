@@ -41,6 +41,7 @@ $string['managefiles'] = 'Manage files';
 $string['managesources'] = 'Manage sources';
 $string['pluginname'] = 'Imagehub';
 $string['privacy:metadata'] = 'The Imagehub plugin doesn\'t store any personal data.';
+$string['repositorynotenabled'] = 'Imagehub repository is not enabled yet. Click on "Save" to enable it.';
 $string['sourcetitle'] = 'Title';
 $string['sourcetype'] = 'Type';
 $string['sourceurl'] = 'Url';

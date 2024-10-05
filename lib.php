@@ -204,14 +204,25 @@ class repository_imagehub extends repository {
      * @param string $classname
      */
     public static function type_config_form($mform, $classname = 'repository_imagehub') {
+        $type = repository::get_type_by_typename('imagehub');
+        
         // Link to managesources.
-        $url = new moodle_url('/repository/imagehub/managesources.php');
-        $mform->addElement(
-            'static',
-            null,
-            get_string('linktomanagesources', 'repository_imagehub', $url),
-            get_string('linktomanagesources_description', 'repository_imagehub')
-        );
+        if ($type !== null) {
+            $url = new moodle_url('/repository/imagehub/managesources.php');
+            $mform->addElement(
+                'static',
+                null,
+                get_string('linktomanagesources', 'repository_imagehub', $url),
+                get_string('linktomanagesources_description', 'repository_imagehub')
+            );
+        } else {
+            $mform->addElement(
+                'static',
+                null,
+                get_string('repositorynotenabled', 'repository_imagehub'),
+                ''
+            );
+        }
     }
 
     /**
