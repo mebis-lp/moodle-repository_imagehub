@@ -42,7 +42,7 @@ $capabilities = [
         'contextlevel' => context_system::instance()->id,
         'archetypes' => [
             'user' => CAP_PROHIBIT,
-            'admin' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
         ],
     ],
 ];
