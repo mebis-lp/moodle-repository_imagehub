@@ -85,6 +85,8 @@ class managesources_form extends dynamic_form {
         $context = $this->get_context_for_dynamic_submission();
         $formdata = $this->get_data();
 
+        require_capability('repository/imagehub:managerepositories', $context);
+
         $formdata->timemodified = time();
         $formdata->lastupdate = time();
 

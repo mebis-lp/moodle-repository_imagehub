@@ -25,8 +25,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use core\reportbuilder\local\entities\context;
-
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot . '/repository/lib.php');
@@ -72,12 +70,32 @@ class repository_imagehub extends repository {
      *           path, current path and parent path
      */
     public function get_listing($path = '', $page = '') {
-        $ret = [];
-        $ret['list'] = self::get_file_list($path, $page);
-        $ret['norefresh'] = true;
-        $ret['nologin'] = true;
-        $ret['dynload'] = true;
+        $ret = [
+            'list' => self::get_file_list($path, $page),
+            'norefresh' => true,
+            'nologin' => true,
+            'dynload' => true,
+            'nosearch' => false,
+        ];
         return $ret;
+    }
+
+    /**
+     * Search for files.
+     *
+     * @param string $search_text
+     * @param integer $page
+     * @return void
+     */
+    public function search($search, $page = 0) {
+        return [
+            'list' => $this->get_file_list('', $page, $search),
+            'norefresh' => true,
+            'nologin' => true,
+            'dynload' => true,
+            'nosearch' => false,
+            'issearchresult' => true,
+        ];
     }
 
     /**
@@ -98,7 +116,7 @@ class repository_imagehub extends repository {
             $files = array_merge(
                 $files,
                 $fs->get_directory_files(
-                    context_system::instance()->id,
+                    \context_system::instance()->id,
                     'repository_imagehub',
                     'images',
                     $sourceid,
@@ -108,14 +126,20 @@ class repository_imagehub extends repository {
                 )
             );
         }
-        $results = $DB->get_records('repository_imagehub', null, '', 'fileid, title');
+        $where = '';
+        $params = [];
+        if (!empty($search)) {
+            $where = $DB->sql_like('title', ':search', false, false);
+            $params = ['search' => '%' . $DB->sql_like_escape($search) . '%'];
+        }
+        $results = $DB->get_records_select('repository_imagehub', $where, $params, '', 'fileid, title');
         foreach ($files as $file) {
-            if (!str_starts_with($file->get_mimetype(), 'image')) {
+            if (!str_starts_with($file->get_mimetype(), 'image') || !array_key_exists($file->get_id(), $results)) {
                 continue;
             }
             $node['thumbnail'] = $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false);
             $filelistentry = [
-                'title' => $results[$file->id]->title ?? $file->get_filename(),
+                'title' => $results[$file->get_id()]->title ?? $file->get_filename(),
                 'size' => $file->get_filesize(),
                 'filename' => $file->get_filename(),
                 'thumbnail' => $OUTPUT->image_url(file_extension_icon($file->get_filename()))->out(false),

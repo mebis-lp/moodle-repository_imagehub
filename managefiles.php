@@ -37,6 +37,8 @@ $PAGE->set_context(context_system::instance());
 $PAGE->set_heading(get_string('managefiles', 'repository_imagehub'));
 echo $OUTPUT->header();
 
+require_capability('repository/imagehub:managerepositories', context_system::instance());
+
 $source = $DB->get_record('repository_imagehub_sources', ['id' => $sourceid], '*', MUST_EXIST);
 
 $fs = get_file_storage();

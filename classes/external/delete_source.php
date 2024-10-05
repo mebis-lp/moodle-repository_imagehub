@@ -24,6 +24,7 @@
 
 namespace repository_imagehub\external;
 
+use repository_imagehub\manager;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_single_structure;
@@ -53,13 +54,13 @@ class delete_source extends external_api {
      * @throws dml_exception
      */
     public static function execute(int $id): array {
-        global $DB;
         self::validate_parameters(self::execute_parameters(), [
             'id' => $id,
         ]);
 
-        // Delete source.
-        $DB->delete_records_select('repository_imagehub_sources', 'id = ?', [$id]);
+        require_capability('repository/imagehub:managerepositories', \context_system::instance());
+
+        manager::delete_source($id);
 
         return ['result' => true];
     }

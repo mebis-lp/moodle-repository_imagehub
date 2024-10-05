@@ -72,7 +72,7 @@ function deleteModal(e, id, title) {
             try {
                 const deleted = await externalServices.deleteSource(id);
                 if (deleted) {
-                    const row = document.querySelector('[sourceid="' + id + '"]');
+                    const row = document.querySelector('[data-sourceid="' + id + '"]');
                     if (row) {
                         row.remove();
                     }

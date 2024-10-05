@@ -106,7 +106,7 @@ class manager {
                 'repository_imagehub',
                 'repository_imagehub',
                 $itemid,
-                context_system::instance(),
+                \context_system::instance(),
                 $metadata['tags']
             );
         }
@@ -127,11 +127,12 @@ class manager {
         foreach ($files as $file) {
             if ($file->get_filename() == 'metadata.json') {
                 $metadata = json_decode($file->get_content(), true);
-                if (!is_array($metadata)) {
-                    $metadata = ['images' => $metadata];
+                // Handle metadata files that refer to only one image.
+                if (!array_key_exists('images', $metadata)) {
+                    $metadata = ['images' => [$metadata]];
                 }
                 
-                foreach ($metadata as $metadataitem) {
+                foreach ($metadata['images'] as $metadataitem) {
                     $imagefile = $fs->get_file(
                         $file->get_contextid(),
                         $file->get_component(),
@@ -233,6 +234,10 @@ class manager {
             } else {
                 if ($targetfile->get_contenthash() != $file->get_contenthash()) {
                     $targetfile->replace_file_with($file);
+                    $DB->update_record('repository_imagehub', [
+                        'fileid' => $targetfile->get_id(),
+                        'source' => $sourceid,
+                    ]);
                 }
             }
         }
@@ -250,5 +255,17 @@ class manager {
      * @param \moodle_url $weburl The web url.
      */
     public static function import_files_from_web(\moodle_url $weburl) {
+    }
+
+    /**
+     * Delete a source.
+     * @param int $sourceid The id of the source.
+     */
+    public static function delete_source($sourceid) {
+        global $DB;
+        $fs = get_file_storage();
+        $fs->delete_area_files(\context_system::instance()->id, 'repository_imagehub', 'images', $sourceid);
+        $DB->delete_records('repository_imagehub', ['source' => $sourceid]);
+        $DB->delete_records('repository_imagehub_sources', ['id' => $sourceid]);
     }
 }
