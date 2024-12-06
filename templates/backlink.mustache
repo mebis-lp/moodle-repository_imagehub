@@ -25,10 +25,12 @@
         "linktext" : "Back to the main page"
     }
 }}
-<div class="row">
-    <div class="col offset-3">
+<div class="row mform flex my-6 ">
+    <div class="col-md-9 d-flex justify-content-between align-items-center">
         <a href="{{{linkto}}}" class="btn btn-secondary">
-            {{linktext}}
+            <i class="fas fa-angle-left mr-2"></i>  {{linktext}}
         </a>
+
+        <div class="mr-6 ">{{#str}}addfilesdescription, repository_imagehub{{/str}}</div>
     </div>
 </div>

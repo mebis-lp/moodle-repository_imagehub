@@ -29,6 +29,34 @@ use stored_file;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
+
+    protected static $filereport;
+
+    public function __construct() {
+        self::$filereport = [
+            'has_data' => false,
+            'files_imported' => [],
+            'files_error' => [],
+            'files_replaced' => [],
+            'stats' => [
+                'total' => 0,
+                'imported' => 0,
+                'error' => 0,
+                'replaced' => 0,
+            ],
+        ];
+    }
+
+
+    /**
+     * Get the file report.
+     * @return array The file report.
+     */
+    public static function get_file_report() {
+        return self::$filereport;
+    }
+
+
     /**
      * Add a file to the repository.
      * @param stored_file $file
@@ -118,6 +146,9 @@ class manager {
         }
     }
 
+
+
+
     /**
      * Process metadata for a source.
      * @param int $sourceid The id of the source.
@@ -185,10 +216,11 @@ class manager {
         self::process_metadata($sourceid);
 
         $fs->delete_area_files(\context_system::instance()->id, 'repository_imagehub', 'temp', $sourceid, '/');
+
     }
 
     /**
-     * Import files from a directory.
+     * Import files from a directory and create a detailed report.
      * @param stored_file $directory The directory.
      * @param int $sourceid The id of the source.
      * @param bool $deleteold Whether to delete old files. Default is false.
@@ -213,37 +245,53 @@ class manager {
         );
 
         foreach ($files as $file) {
-            $targetfile = $fs->get_file(
-                \context_system::instance()->id,
-                'repository_imagehub',
-                'images',
-                $sourceid,
-                $file->get_filepath(),
-                $file->get_filename()
-            );
-            if (!$targetfile) {
-                $targetfile = $fs->create_file_from_storedfile([
-                    'contextid' => \context_system::instance()->id,
-                    'component' => 'repository_imagehub',
-                    'filearea' => 'images',
-                    'itemid' => $file->get_itemid(),
-                    'filepath' => $file->get_filepath(),
-                    'filename' => $file->get_filename(),
-                ], $file);
-                $DB->insert_record('repository_imagehub', [
-                    'fileid' => $targetfile->get_id(),
-                    'source' => $sourceid,
-                ]);
-            } else {
-                if ($targetfile->get_contenthash() != $file->get_contenthash()) {
-                    $targetfile->replace_file_with($file);
-                    $DB->update_record('repository_imagehub', [
+            try {
+                $targetfile = $fs->get_file(
+                    \context_system::instance()->id,
+                    'repository_imagehub',
+                    'images',
+                    $sourceid,
+                    $file->get_filepath(),
+                    $file->get_filename()
+                );
+                if (!$targetfile) {
+                    $targetfile = $fs->create_file_from_storedfile([
+                        'contextid' => \context_system::instance()->id,
+                        'component' => 'repository_imagehub',
+                        'filearea' => 'images',
+                        'itemid' => $file->get_itemid(),
+                        'filepath' => $file->get_filepath(),
+                        'filename' => $file->get_filename(),
+                    ], $file);
+                    $DB->insert_record('repository_imagehub', [
                         'fileid' => $targetfile->get_id(),
                         'source' => $sourceid,
                     ]);
+
+                    self::$filereport['files_imported'][] = $file->get_filepath() . $file->get_filename();
+                } else {
+                    if ($targetfile->get_contenthash() != $file->get_contenthash()) {
+                        $targetfile->replace_file_with($file);
+                        $DB->update_record('repository_imagehub', [
+                            'fileid' => $targetfile->get_id(),
+                            'source' => $sourceid,
+                        ]);
+                        self::$filereport['files_replaced'][] = $file->get_filepath() . $file->get_filename();
+                    }
                 }
+            } catch (\Exception $e) {
+                // Skip file if an error occurs.
+                self::$filereport['files_error'][] = $file->get_filepath() . $file->get_filename();
             }
         }
+
+        // Calculate the stats
+        self::$filereport['stats']['error'] = count(self::$filereport['files_error']);
+        self::$filereport['stats']['imported'] = count(self::$filereport['files_imported']);
+        self::$filereport['stats']['replaced'] = count(self::$filereport['files_replaced']);
+        // Set has_data to true if anything has been imported in order to show filereport in filereport.mustache-template.
+        self::$filereport['has_data'] = self::$filereport['stats']['imported'] > 0 || self::$filereport['stats']['replaced'] > 0;
+
     }
 
     /**

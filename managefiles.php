@@ -60,8 +60,12 @@ if ($managefilesform->is_submitted()) {
         if ($source->type == \repository_imagehub::SOURCE_TYPE_ZIP_VALUE) {
             $draftarea = $fs->get_area_files(core\context\user::instance($USER->id)->id, 'user', 'draft', $draftitemid, '', false);
             if (count($draftarea) == 1) {
+                $filemanager = new \repository_imagehub\manager();
                 $zipfile = array_pop($draftarea);
-                \repository_imagehub\manager::import_files_from_zip($zipfile, $sourceid);
+                $filemanager::import_files_from_zip($zipfile, $sourceid);
+                $filereport = $filemanager::get_file_report();
+
+
             }
         } else {
             file_save_draft_area_files(
@@ -76,15 +80,22 @@ if ($managefilesform->is_submitted()) {
     }
 }
 
-$data = (array)$managefilesform->get_data();
-$managefilesform->data_preprocessing($data);
-$managefilesform->set_data($data);
-$managefilesform->display();
+// File report.
+echo $OUTPUT->render_from_template('repository_imagehub/filereport', $filereport);
 
 // Backlink.
 echo($OUTPUT->render_from_template('repository_imagehub/backlink', [
     'linkto' => new moodle_url('/repository/imagehub/managesources.php'),
     'linktext' => get_string('backtofiles', 'repository_imagehub'),
 ]));
+
+
+$data = (array)$managefilesform->get_data();
+$managefilesform->data_preprocessing($data);
+$managefilesform->set_data($data);
+$managefilesform->display();
+
+
+
 
 echo $OUTPUT->footer();
