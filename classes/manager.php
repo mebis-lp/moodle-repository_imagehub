@@ -149,9 +149,6 @@ class manager {
         }
     }
 
-
-
-
     /**
      * Process metadata for a source.
      * @param int $sourceid The id of the source.

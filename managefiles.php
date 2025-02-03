@@ -86,13 +86,9 @@ echo($OUTPUT->render_from_template('repository_imagehub/backlink', [
     'linktext' => get_string('backtofiles', 'repository_imagehub'),
 ]));
 
-
 $data = (array)$managefilesform->get_data();
 $managefilesform->data_preprocessing($data);
 $managefilesform->set_data($data);
 $managefilesform->display();
-
-
-
 
 echo $OUTPUT->footer();
