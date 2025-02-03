@@ -29,9 +29,12 @@ use stored_file;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manager {
-
+    /** @var array $filereport Data for the file report after uploading a zip. */
     protected static $filereport;
 
+    /**
+     * manager constructor.
+     */
     public function __construct() {
         self::$filereport = [
             'has_data' => false,
@@ -216,7 +219,6 @@ class manager {
         self::process_metadata($sourceid);
 
         $fs->delete_area_files(\context_system::instance()->id, 'repository_imagehub', 'temp', $sourceid, '/');
-
     }
 
     /**
@@ -285,13 +287,12 @@ class manager {
             }
         }
 
-        // Calculate the stats
+        // Calculate the stats.
         self::$filereport['stats']['error'] = count(self::$filereport['files_error']);
         self::$filereport['stats']['imported'] = count(self::$filereport['files_imported']);
         self::$filereport['stats']['replaced'] = count(self::$filereport['files_replaced']);
         // Set has_data to true if anything has been imported in order to show filereport in filereport.mustache-template.
         self::$filereport['has_data'] = self::$filereport['stats']['imported'] > 0 || self::$filereport['stats']['replaced'] > 0;
-
     }
 
     /**

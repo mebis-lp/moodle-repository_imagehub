@@ -64,8 +64,8 @@ if ($managefilesform->is_submitted()) {
                 $zipfile = array_pop($draftarea);
                 $filemanager::import_files_from_zip($zipfile, $sourceid);
                 $filereport = $filemanager::get_file_report();
-
-
+                // File report.
+                echo $OUTPUT->render_from_template('repository_imagehub/filereport', $filereport);
             }
         } else {
             file_save_draft_area_files(
@@ -79,9 +79,6 @@ if ($managefilesform->is_submitted()) {
         }
     }
 }
-
-// File report.
-echo $OUTPUT->render_from_template('repository_imagehub/filereport', $filereport);
 
 // Backlink.
 echo($OUTPUT->render_from_template('repository_imagehub/backlink', [
