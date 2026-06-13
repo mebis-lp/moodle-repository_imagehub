@@ -51,5 +51,23 @@ function xmldb_repository_imagehub_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025021300, 'repository', 'imagehub');
     }
 
+    if ($oldversion < 2025021301) {
+        // The plugin used to register its own tag collection in db/tag.php. It has now been removed so the tag area
+        // belongs to the default collection. Moodle moves the area to the default collection automatically during this
+        // upgrade, but the now orphaned (empty) collection itself is not removed and would distort core ReportBuilder
+        // tag reports (see MDL-85114, MDL-88616). We therefore delete the leftover collection explicitly.
+        //
+        // core_tag_collection::delete() safely moves any remaining tag areas to the default collection, deletes the
+        // collection's tags, removes the tag_coll record, purges the tags cache and fires the tag_collection_deleted
+        // event. It refuses to delete the default collection, so this is safe even if the lookup ever matched it.
+        $collection = $DB->get_record('tag_coll', ['component' => 'repository_imagehub']);
+        if ($collection) {
+            \core_tag_collection::delete($collection);
+        }
+
+        // Imagehub savepoint reached.
+        upgrade_plugin_savepoint(true, 2025021301, 'repository', 'imagehub');
+    }
+
     return true;
 }
