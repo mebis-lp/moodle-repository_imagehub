@@ -12,7 +12,7 @@ export const init = async() => {
     });
 
     // Add listener to edit sources.
-    let editsources = document.getElementsByClassName('edit');
+    let editsources = document.querySelectorAll('.edit');
     editsources.forEach(element => {
         element.addEventListener('click', async(e) => {
             showModal(e, element.dataset.id);
@@ -20,7 +20,7 @@ export const init = async() => {
     });
 
     // Add listener to delete sources.
-    let deletesources = document.getElementsByClassName('delete');
+    let deletesources = document.querySelectorAll('.delete');
     deletesources.forEach(element => {
         element.addEventListener('click', async(e) => {
             deleteModal(e, element.dataset.id, element.dataset.title);
