@@ -37,7 +37,6 @@ function xmldb_repository_imagehub_upgrade($oldversion) {
     $dbman = $DB->get_manager();
 
     if ($oldversion < 2025021300) {
-
         // Define field description to be added to repository_imagehub.
         $table = new xmldb_table('repository_imagehub');
         $field = new xmldb_field('description', XMLDB_TYPE_CHAR, '1333', null, null, null, null, 'title');
